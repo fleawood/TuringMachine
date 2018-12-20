@@ -19,9 +19,11 @@ public class Main {
         String inputFileName = args[1];
 
         String[] tmLines = readFile(tmFileName);
-
+        Parser parser = new Parser();
+        parser.parse(tmLines);
     }
 
+    @NotNull
     private static String[] readFile(String FileName) {
         Path file = Paths.get(FileName);
         Charset charset = StandardCharsets.US_ASCII;
@@ -29,6 +31,7 @@ public class Main {
         try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
             String line;
             while ((line = reader.readLine()) != null) {
+                line = line.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 list.add(line);
             }
         } catch (IOException x) {
