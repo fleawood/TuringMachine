@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -10,7 +8,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(@NotNull String[] args) {
+    private static final String consoleFileName = "console.txt";
+    private static final String resultFileName = "result.txt";
+
+    public static void main(String[] args) {
         if (args.length != 2) {
             System.out.println("Error");
             return;
@@ -28,7 +29,6 @@ public class Main {
         }
     }
 
-    @NotNull
     private static String[] readFile(String FileName) {
         Path file = Paths.get(FileName);
         Charset charset = StandardCharsets.US_ASCII;

@@ -1,8 +1,8 @@
 import java.util.HashMap;
 
-public class Transitions {
+class Transitions {
     private HashMap<TransOldArgs, TransNewArgs> trans;
-
+    private final static Character wildcard = '*';
     Transitions() {
         trans = new HashMap<>();
     }
@@ -10,13 +10,14 @@ public class Transitions {
     void addNewTransition(String oldState, char oldSymbol, String newState, char newSymbol, int dir) {
         TransOldArgs oldArgs = new TransOldArgs(oldState, oldSymbol);
         TransNewArgs newArgs = new TransNewArgs(newState, newSymbol, dir);
-//        System.out.println(oldArgs.hashCode());
         trans.put(oldArgs, newArgs);
     }
 
-    TransNewArgs getNextArgs(String currentState, Character currentSymbol) {
-        TransOldArgs oldArgs = new TransOldArgs(currentState, currentSymbol);
-//        System.out.println(oldArgs.hashCode());
+    TransNewArgs getTrans(TransOldArgs oldArgs) {
         return trans.get(oldArgs);
+    }
+    TransNewArgs getNextArgs(String currentState, Character currentSymbol) {
+        TransNewArgs res = trans.get(new TransOldArgs(currentState, currentSymbol));
+        return res == null ? trans.get(new TransOldArgs(currentState, wildcard)) : res;
     }
 }

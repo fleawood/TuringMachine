@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashSet;
 
 public class Parser {
@@ -19,12 +17,12 @@ public class Parser {
         transitions = new Transitions();
     }
 
-    private void error(@NotNull String[] lines, @NotNull Integer i) throws SyntaxException {
+    private void error(String[] lines, Integer i) throws SyntaxException {
         String message = String.format("Error in line `%s`%n", lines[i]);
         throw new SyntaxException(message);
     }
 
-    private String cropComment(@NotNull String string) {
+    private String cropComment(String string) {
         int k = string.indexOf(';');
         if (k == -1) return string;
         return string.substring(0, k);

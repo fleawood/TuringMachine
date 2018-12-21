@@ -1,12 +1,8 @@
-import javafx.util.Pair;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class Simulator {
+class Simulator {
     private HashSet<String> states;
     private HashSet<Character> symbols;
     private HashSet<Character> inputSymbols;
@@ -20,6 +16,7 @@ public class Simulator {
     private int head;
 
     private int num_steps;
+    private final static Character wildcard = '*';
 
     Simulator(HashSet<String> states,
               HashSet<Character> symbols,
@@ -44,8 +41,11 @@ public class Simulator {
     private void resetTape(String string) {
         tapePos.clear();
         tapeNeg.clear();
-        for (Character c: string.toCharArray()) {
+        for (Character c : string.toCharArray()) {
             tapePos.add(c);
+        }
+        if (tapePos.isEmpty()) {
+            tapePos.add(blankSymbol);
         }
         tapeNeg.add(blankSymbol);
     }
@@ -120,7 +120,7 @@ public class Simulator {
 
     private String getStringRepr(ArrayList<Character> list) {
         StringBuilder builder = new StringBuilder(list.size());
-        for (Character c: list) {
+        for (Character c : list) {
             builder.append(c);
         }
         return builder.toString();
@@ -136,7 +136,8 @@ public class Simulator {
         final int indexLowerBound = -tapeNeg.size() + 1;
         final int indexUpperBound = tapePos.size() - 1;
 
-        assert indexUpperBound - indexLowerBound == string.length() + 1;
+        if (indexUpperBound - indexLowerBound != string.length() - 1) throw new RuntimeException();
+
         int indexLeft = indexUpperBound, indexRight = indexLowerBound;
 
         for (int i = 0; i < string.length(); i++) {
@@ -145,7 +146,7 @@ public class Simulator {
                 break;
             }
         }
-        for (int i = string.length()-1; i >= 0; --i) {
+        for (int i = string.length() - 1; i >= 0; --i) {
             if (string.charAt(i) != blankSymbol) {
                 indexRight = indexLowerBound + i;
                 break;
@@ -233,6 +234,7 @@ public class Simulator {
     }
 
     private void setCurrentSymbol(Character c) {
+        if (c == wildcard) return;
         if (head < 0) {
             tapeNeg.set(-head, c);
         } else {
@@ -285,8 +287,7 @@ public class Simulator {
         printEnd();
         if (result) {
             System.out.println("Accept");
-        }
-        else {
+        } else {
             System.out.println("Reject");
         }
     }
