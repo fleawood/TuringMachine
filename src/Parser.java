@@ -1,5 +1,4 @@
 import org.jetbrains.annotations.NotNull;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.util.HashSet;
 
@@ -10,14 +9,14 @@ public class Parser {
     private String initState;
     private Character blankSymbol;
     private HashSet<String> finalStates;
-    private HashSet<Transition> transitions;
+    private Transitions transitions;
 
     Parser() {
         states = new HashSet<>();
         symbols = new HashSet<>();
         inputSymbols = new HashSet<>();
-        finalStates =new HashSet<>();
-        transitions = new HashSet<>();
+        finalStates = new HashSet<>();
+        transitions = new Transitions();
     }
 
     private void error(@NotNull String[] lines, @NotNull Integer i) throws SyntaxException {
@@ -77,20 +76,18 @@ public class Parser {
         }
     }
 
-    private Transition buildTrans(String[] strings) {
-        if (strings.length != 5) {
+    private void addTrans(String[] strings) {
+        assert strings.length == 5;
 
-        }
         String oldState, newState;
         char oldSymbol, newSymbol;
         int dir = 0;
 
         oldState = strings[0];
         oldSymbol = strings[1].charAt(0);
-        newState = strings[2];
-        newSymbol = strings[3].charAt(0);
+        newSymbol = strings[2].charAt(0);
 
-        switch (strings[4].charAt(0)) {
+        switch (strings[3].charAt(0)) {
             case 'l':
                 dir = -1;
                 break;
@@ -101,7 +98,8 @@ public class Parser {
                 dir = 0;
                 break;
         }
-        return new Transition(oldState, oldSymbol, newState, newSymbol, dir);
+        newState = strings[4];
+        transitions.addNewTransition(oldState, oldSymbol, newState, newSymbol, dir);
     }
 
     private int readStateSet(String[] lines, int i) throws SyntaxException, IndexOutOfBoundsException {
@@ -151,17 +149,17 @@ public class Parser {
 
     private int readTransFunc(String[] lines, int i) {
         while (i < lines.length) {
-            int index = getNextLineIndex(lines, i);
-            String line = lines[index];
+            i = getNextLineIndex(lines, i);
+            String line = lines[i];
             if (line == null) break;
             String[] strings = line.split(" ");
-            transitions.add(buildTrans(strings));
-            i++;
+            addTrans(strings);
+            i = i + 1;
         }
         return i;
     }
 
-    void parse(String[] lines) {
+    Simulator parse(String[] lines) {
         int i = 0;
         i = readStateSet(lines, i);
         i = readInputSymbols(lines, i + 1);
@@ -172,6 +170,7 @@ public class Parser {
         i = readTransFunc(lines, i + 1);
 
 //        System.out.println("OK");
+        return new Simulator(states, symbols, inputSymbols, initState, blankSymbol, finalStates, transitions);
     }
 
     public static void main(String[] args) {

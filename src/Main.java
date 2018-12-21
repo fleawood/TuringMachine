@@ -20,7 +20,12 @@ public class Main {
 
         String[] tmLines = readFile(tmFileName);
         Parser parser = new Parser();
-        parser.parse(tmLines);
+        Simulator simulator = parser.parse(tmLines);
+
+        String[] inputLines = readFile(inputFileName);
+        for (String line: inputLines) {
+            simulator.simulate(line);
+        }
     }
 
     @NotNull
@@ -31,7 +36,6 @@ public class Main {
         try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
             String line;
             while ((line = reader.readLine()) != null) {
-                line = line.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
                 list.add(line);
             }
         } catch (IOException x) {
