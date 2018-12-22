@@ -4,33 +4,25 @@ import java.util.HashSet;
 
 
 class Simulator {
-    private HashSet<String> states;
-    private HashSet<Character> symbols;
+    private final static Character wildcard = '*';
     private HashSet<Character> inputSymbols;
     private String initState;
     private Character blankSymbol;
     private HashSet<String> finalStates;
     private Transitions transitions;
-
     private String currentState;
     private ArrayList<Character> tapePos, tapeNeg;
     private int head;
-
     private int num_steps;
-    private final static Character wildcard = '*';
-
     private PrintWriter consoleOutput;
     private PrintWriter resultOutput;
 
-    Simulator(HashSet<String> states,
-              HashSet<Character> symbols,
-              HashSet<Character> inputSymbols,
+    Simulator(HashSet<Character> inputSymbols,
               String initState,
               Character blankSymbol,
               HashSet<String> finalStates,
               Transitions transitions) {
-        this.states = states;
-        this.symbols = symbols;
+
         this.inputSymbols = inputSymbols;
         this.initState = initState;
         this.blankSymbol = blankSymbol;
@@ -222,10 +214,6 @@ class Simulator {
         }
     }
 
-    private void setCurrentState(String state) {
-        currentState = state;
-    }
-
     private void setCurrentSymbol(Character c) {
         if (c == wildcard) return;
         if (head < 0) {
@@ -235,8 +223,12 @@ class Simulator {
         }
     }
 
-    private void setCurrentHead(int k) {
-        head = k;
+    private void setCurrentState(String state) {
+        currentState = state;
+    }
+
+    private void resetCurrentHead() {
+        head = 0;
     }
 
     private void moveCurrentHead(int dir) {
@@ -255,7 +247,7 @@ class Simulator {
         printRun();
 
         num_steps = 0;
-        setCurrentHead(0);
+        resetCurrentHead();
         setCurrentState(initState);
         resetTape(string);
         boolean result;

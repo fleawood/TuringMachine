@@ -17,6 +17,10 @@ public class Parser {
         transitions = new Transitions();
     }
 
+    public static void main(String[] args) {
+        System.out.println("You are debugging `Parser`.");
+    }
+
     private void error(String[] lines, Integer i) throws SyntaxException {
         String message = String.format("Error in line `%s`%n", lines[i]);
         throw new SyntaxException(message);
@@ -107,7 +111,6 @@ public class Parser {
         return index;
     }
 
-
     private int readInputSymbols(String[] lines, int i) {
         int index = getNextLineIndex(lines, i);
         String[] strings = getSetContent(lines[index], "S");
@@ -167,11 +170,7 @@ public class Parser {
         i = readFinalSymbols(lines, i + 1);
         i = readTransFunc(lines, i + 1);
 
-//        System.out.println("OK");
-        return new Simulator(states, symbols, inputSymbols, initState, blankSymbol, finalStates, transitions);
-    }
-
-    public static void main(String[] args) {
-        System.out.println("You are debugging `Parser`.");
+        if (i != lines.length) throw new RuntimeException();
+        return new Simulator(inputSymbols, initState, blankSymbol, finalStates, transitions);
     }
 }

@@ -1,9 +1,9 @@
-public class SyntaxException extends RuntimeException {
-    public SyntaxException() {
+class SyntaxException extends RuntimeException {
+    SyntaxException() {
         super();
     }
 
-    public SyntaxException(String message) {
+    SyntaxException(String message) {
         super(message);
     }
 }
