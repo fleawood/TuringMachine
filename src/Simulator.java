@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -18,6 +19,9 @@ class Simulator {
     private int num_steps;
     private final static Character wildcard = '*';
 
+    private PrintWriter consoleOutput;
+    private PrintWriter resultOutput;
+
     Simulator(HashSet<String> states,
               HashSet<Character> symbols,
               HashSet<Character> inputSymbols,
@@ -36,6 +40,8 @@ class Simulator {
         tapePos = new ArrayList<>();
         tapeNeg = new ArrayList<>();
 
+        consoleOutput = new PrintWriter(System.out);
+        resultOutput = new PrintWriter(System.out);
     }
 
     private void resetTape(String string) {
@@ -51,25 +57,25 @@ class Simulator {
     }
 
     private void printEnd() {
-        System.out.println("==================== END ====================");
+        consoleOutput.println("==================== END ====================");
     }
 
     private void printIllegal(String string) {
-        System.out.println("==================== ERR ====================");
-        System.out.printf("The input \"%s\" is illegal%n", string);
+        consoleOutput.println("==================== ERR ====================");
+        consoleOutput.printf("The input \"%s\" is illegal%n", string);
 
     }
 
     private void printRun() {
-        System.out.println("==================== RUN ====================");
+        consoleOutput.println("==================== RUN ====================");
     }
 
     private void printInput(String string) {
-        System.out.printf("Input: %s%n", string);
+        consoleOutput.printf("Input: %s%n", string);
     }
 
     private void printStep() {
-        System.out.printf("Step  : %d%n", num_steps);
+        consoleOutput.printf("Step  : %d%n", num_steps);
     }
 
     private void appendExtraBlanks(StringBuilder builder, int k) {
@@ -152,19 +158,6 @@ class Simulator {
                 break;
             }
         }
-//        for (int i = indexLowerBound; i <= indexUpperBound; i++) {
-//            if (string.charAt(i) != blankSymbol) {
-//                indexLeft = i;
-//                break;
-//            }
-//        }
-//
-//        for (int i = indexUpperBound; i >= indexLowerBound; i--) {
-//            if (string.charAt(i) != blankSymbol) {
-//                indexRight = i;
-//                break;
-//            }
-//        }
 
         if (head < indexLeft) indexLeft = head;
         if (head > indexRight) indexRight = head;
@@ -174,17 +167,17 @@ class Simulator {
         String headString = "Tape  : " + strings[1].replaceAll("\\s+$", "");
         String tapeString = "Head  : " + strings[2].replaceAll("\\s+$", "");
 
-        System.out.println(indexString);
-        System.out.println(headString);
-        System.out.println(tapeString);
+        consoleOutput.println(indexString);
+        consoleOutput.println(headString);
+        consoleOutput.println(tapeString);
     }
 
     private void printState() {
-        System.out.printf("State : %s%n", currentState);
+        consoleOutput.printf("State : %s%n", currentState);
     }
 
     private void printDividingLine() {
-        System.out.println("---------------------------------------------");
+        consoleOutput.println("---------------------------------------------");
     }
 
 
@@ -200,7 +193,7 @@ class Simulator {
         String regexFirst = "^" + blankSymbol + "+";
         String regexLast = blankSymbol + "+$";
         string = string.replaceAll(regexFirst, "").replaceAll(regexLast, "");
-        System.out.printf("Result: %s%n", string);
+        consoleOutput.printf("Result: %s%n", string);
     }
 
     private boolean checkInput(String string) {
@@ -256,22 +249,22 @@ class Simulator {
         if (!checkInput(string)) {
             printIllegal(string);
             printEnd();
+            resultOutput.println("Error");
             return;
         }
         printRun();
 
         num_steps = 0;
-
         setCurrentHead(0);
         setCurrentState(initState);
         resetTape(string);
         boolean result;
         while (true) {
+            printDetails();
             if (finalStates.contains(currentState)) {
                 result = true;
                 break;
             }
-            printDetails();
             Character currentSymbol = getCurrentSymbol();
             TransNewArgs newArgs = transitions.getNextArgs(currentState, currentSymbol);
             if (newArgs == null) {
@@ -286,10 +279,22 @@ class Simulator {
         printResult();
         printEnd();
         if (result) {
-            System.out.println("Accept");
+            resultOutput.println("Accept");
         } else {
-            System.out.println("Reject");
+            resultOutput.println("Reject");
         }
     }
 
+    void setConsoleOutput(PrintWriter printWriter) {
+        consoleOutput = printWriter;
+    }
+
+    void setResultOutput(PrintWriter printWriter) {
+        resultOutput = printWriter;
+    }
+
+    void closeOutput() {
+        consoleOutput.close();
+        resultOutput.close();
+    }
 }

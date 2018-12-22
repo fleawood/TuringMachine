@@ -3,6 +3,7 @@ import java.util.HashMap;
 class Transitions {
     private HashMap<TransOldArgs, TransNewArgs> trans;
     private final static Character wildcard = '*';
+
     Transitions() {
         trans = new HashMap<>();
     }
@@ -16,6 +17,7 @@ class Transitions {
     TransNewArgs getTrans(TransOldArgs oldArgs) {
         return trans.get(oldArgs);
     }
+
     TransNewArgs getNextArgs(String currentState, Character currentSymbol) {
         TransNewArgs res = trans.get(new TransOldArgs(currentState, currentSymbol));
         return res == null ? trans.get(new TransOldArgs(currentState, wildcard)) : res;
