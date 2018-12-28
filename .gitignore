@@ -4,3 +4,7 @@ out/
 
 *.tm
 *.txt
+*.jar
+
+!case*/test.tm
+!case*/input.txt

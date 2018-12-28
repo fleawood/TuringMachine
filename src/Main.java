@@ -12,9 +12,10 @@ import java.util.ArrayList;
 public class Main {
     private static final String consoleFileName = "console.txt";
     private static final String resultFileName = "result.txt";
+    private static final String testTMFileName = "test.tm";
+    private static final String inputFileName = "input.txt";
 
-    private static PrintWriter getPrintWriter(String fileName) {
-        Path file = Paths.get(fileName);
+    private static PrintWriter getPrintWriter(Path file) {
         Charset charset = StandardCharsets.US_ASCII;
         try {
             BufferedWriter bufferedWriter = Files.newBufferedWriter(file, charset);
@@ -26,21 +27,25 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Error");
-            return;
+        if (args.length != 1) {
+            System.err.printf("Expect 1 argument, but get %d argument(s).", args.length);
+            System.exit(1);
         }
-        String tmFileName = args[0];
-        String inputFileName = args[1];
+        String caseDir = args[0];
+        Path TMFile = Paths.get(caseDir, testTMFileName);
+        Path inputFile = Paths.get(caseDir, inputFileName);
 
-        String[] tmLines = readFile(tmFileName);
+        String[] tmLines = readFile(TMFile);
         Parser parser = new Parser();
         Simulator simulator = parser.parse(tmLines);
 
-        String[] inputLines = readFile(inputFileName);
+        String[] inputLines = readFile(inputFile);
 
-        simulator.setConsoleOutput(getPrintWriter(consoleFileName));
-        simulator.setResultOutput(getPrintWriter(resultFileName));
+        Path consoleFile = Paths.get(caseDir, consoleFileName);
+        Path resultFile = Paths.get(caseDir, resultFileName);
+
+        simulator.setConsoleOutput(getPrintWriter(consoleFile));
+        simulator.setResultOutput(getPrintWriter(resultFile));
 
         for (String line : inputLines) {
             simulator.simulate(line);
@@ -48,8 +53,7 @@ public class Main {
         simulator.closeOutput();
     }
 
-    private static String[] readFile(String fileName) {
-        Path file = Paths.get(fileName);
+    private static String[] readFile(Path file) {
         Charset charset = StandardCharsets.US_ASCII;
         ArrayList<String> list = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(file, charset)) {

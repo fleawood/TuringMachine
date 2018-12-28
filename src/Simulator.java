@@ -90,7 +90,7 @@ class Simulator {
             tapeBuilder.append(tape.get(index)).append(' ');
             appendExtraBlanks(tapeBuilder, str.length() - 1);
 
-            headBuilder.append(head == index ? '^' : ' ').append(' ');
+            headBuilder.append(head == i ? '^' : ' ').append(' ');
             appendExtraBlanks(headBuilder, str.length() - 1);
         }
         String indexString = indexBuilder.toString();
@@ -270,11 +270,7 @@ class Simulator {
         }
         printResult();
         printEnd();
-        if (result) {
-            resultOutput.println("Accept");
-        } else {
-            resultOutput.println("Reject");
-        }
+        resultOutput.println(result ? "True" : "False");
     }
 
     void setConsoleOutput(PrintWriter printWriter) {

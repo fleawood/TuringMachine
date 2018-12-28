@@ -1,6 +1,6 @@
 import java.util.HashSet;
 
-public class Parser {
+class Parser {
     private HashSet<String> states;
     private HashSet<Character> symbols;
     private HashSet<Character> inputSymbols;
@@ -15,10 +15,6 @@ public class Parser {
         inputSymbols = new HashSet<>();
         finalStates = new HashSet<>();
         transitions = new Transitions();
-    }
-
-    public static void main(String[] args) {
-        System.out.println("You are debugging `Parser`.");
     }
 
     private void error(String[] lines, Integer i) throws SyntaxException {
