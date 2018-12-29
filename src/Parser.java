@@ -17,8 +17,8 @@ class Parser {
         transitions = new Transitions();
     }
 
-    private void error(String[] lines, Integer i) throws SyntaxException {
-        String message = String.format("Error in line `%s`%n", lines[i]);
+    private void error(String line) throws SyntaxException {
+        String message = String.format("Error in `%s`%n", line);
         throw new SyntaxException(message);
     }
 
@@ -30,8 +30,8 @@ class Parser {
 
     private int getNextLineIndex(String[] lines, int i) {
         while (i < lines.length) {
-            String line = cropComment(lines[i]).replaceAll("\\s+$", "");
-            if (line.isEmpty()) {
+            lines[i] = cropComment(lines[i]).replaceAll("\\s+$", "");
+            if (lines[i].isEmpty()) {
                 i++;
                 continue;
             }
@@ -75,7 +75,9 @@ class Parser {
     }
 
     private void addTrans(String[] strings) {
-        assert strings.length == 5;
+        if (strings.length != 5) {
+            throw new RuntimeException();
+        }
 
         String oldState, newState;
         char oldSymbol, newSymbol;
@@ -100,73 +102,58 @@ class Parser {
         transitions.addNewTransition(oldState, oldSymbol, newState, newSymbol, dir);
     }
 
-    private int readStateSet(String[] lines, int i) throws SyntaxException, IndexOutOfBoundsException {
-        int index = getNextLineIndex(lines, i);
-        String[] strings = getSetContent(lines[index], "Q");
+    private void readStateSet(String line) throws SyntaxException, IndexOutOfBoundsException {
+        String[] strings = getSetContent(line, "Q");
         getOneString(states, strings);
-        return index;
     }
 
-    private int readInputSymbols(String[] lines, int i) {
-        int index = getNextLineIndex(lines, i);
-        String[] strings = getSetContent(lines[index], "S");
+    private void readInputSymbols(String line) {
+        String[] strings = getSetContent(line, "S");
         getOneChar(inputSymbols, strings);
-        return index;
     }
 
-    private int readSymbols(String[] lines, int i) {
-        int index = getNextLineIndex(lines, i);
-        String[] strings = getSetContent(lines[index], "T");
+    private void readSymbols(String line) {
+        String[] strings = getSetContent(line, "T");
         getOneChar(symbols, strings);
-        return index;
     }
 
-    private int readInitState(String[] lines, int i) {
-        int index = getNextLineIndex(lines, i);
-        String string = getContent(lines[index], "q0");
-        if (!states.contains(string)) error(lines, i);
+    private void readInitState(String line) {
+        String string = getContent(line, "q0");
+        if (!states.contains(string)) error(line);
         initState = string;
-        return index;
     }
 
-    private int readBlankSymbol(String[] lines, int i) {
-        int index = getNextLineIndex(lines, i);
-        String string = getContent(lines[index], "B");
-        if (string.length() != 1) error(lines, i);
+    private void readBlankSymbol(String line) {
+        String string = getContent(line, "B");
+        if (string.length() != 1) error(line);
         blankSymbol = string.charAt(0);
-        return index;
     }
 
-    private int readFinalSymbols(String[] lines, int i) {
-        int index = getNextLineIndex(lines, i);
-        String[] strings = getSetContent(lines[index], "F");
+    private void readFinalSymbols(String line) {
+        String[] strings = getSetContent(line, "F");
         getOneString(finalStates, strings);
-        return index;
     }
 
-    private int readTransFunc(String[] lines, int i) {
-        while (i < lines.length) {
-            i = getNextLineIndex(lines, i);
-            String line = lines[i];
-            if (line == null) break;
-            String[] strings = line.split(" ");
-            addTrans(strings);
-            i = i + 1;
-        }
-        return i;
+    private void readTransFunc(String line) {
+        String[] strings = line.split(" ");
+        addTrans(strings);
     }
 
     Simulator parse(String[] lines) {
         int i = 0;
-        i = readStateSet(lines, i);
-        i = readInputSymbols(lines, i + 1);
-        i = readSymbols(lines, i + 1);
-        i = readInitState(lines, i + 1);
-        i = readBlankSymbol(lines, i + 1);
-        i = readFinalSymbols(lines, i + 1);
-        i = readTransFunc(lines, i + 1);
-
-        if (i != lines.length) throw new RuntimeException();
+        while (i < lines.length) {
+            i = getNextLineIndex(lines, i);
+            if (i == -1) break;
+            String line = lines[i];
+            if (line.startsWith("#Q")) readStateSet(line);
+            else if (line.startsWith("#S")) readInputSymbols(line);
+            else if (line.startsWith("#T")) readSymbols(line);
+            else if (line.startsWith("#q0")) readInitState(line);
+            else if (line.startsWith("#B")) readBlankSymbol(line);
+            else if (line.startsWith("#F")) readFinalSymbols(line);
+            else readTransFunc(line);
+            i++;
+        }
         return new Simulator(inputSymbols, initState, blankSymbol, finalStates, transitions);
     }
 }
