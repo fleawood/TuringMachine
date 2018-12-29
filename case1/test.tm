@@ -1,3 +1,8 @@
+; we can achieve the goal by 3 steps
+; first, check whether the input is the form 1*x1*=1*
+; second, subtract the number of 1 after = to 0
+; third, check whether the result is the form x1*=
+
 #Q = {q0,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,acc,acc2,acc3,acc4,rej,rej2,rej3,rej4,rej5,reg6,halt_acc,halt_rej}
 #S = {1,=,x}
 #T = {1,=,x,_,0,T,r,u,e,F,a,l,s}

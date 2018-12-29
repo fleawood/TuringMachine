@@ -1,3 +1,7 @@
+; we can achieve the goal by 2 steps
+; first, cut the input into 2 halves
+; second, check whether the symbols of corresponding position are the same
+
 #Q = {q0,q1,q2,q3,q4,q5,q6,q7,q8,acc,acc2,acc3,acc4,rej,halt_acc,halt_rej}
 #S = {a,b}
 #T = {a,b,_,0,1,x,T,r,u,e,F,l,s}
